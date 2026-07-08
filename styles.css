@@ -371,6 +371,7 @@ section[id]{ scroll-margin-top: var(--header-h); }
    7. FACE SHAPE FINDER (upload + overlay)
 ============================================================ */
 .fsf-gender{ display:flex; justify-content:center; margin:0 0 34px; }
+.fsf-ai-cta{ margin-top:56px; text-align:center; }
 .fsf-upload-wrap{ max-width:340px; margin:0 auto 14px; }
 .fsf-photo-stage{
   position:relative; aspect-ratio:3/4; border-radius:var(--radius); overflow:hidden;
