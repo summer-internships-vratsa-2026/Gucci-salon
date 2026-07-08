@@ -590,10 +590,9 @@ body{ padding-bottom:70px; }
   40%{ opacity:1; transform:scale(1); }
 }
 
-/* Composer floats and stays pinned to the bottom of the viewport while messages scroll beneath it,
-   the same way this chat's own message box behaves. */
+/* Composer stays fixed to the viewport at all times, the same way this chat's own input box behaves. */
 .svejarka-composer{
-  position:sticky; bottom:70px; z-index:500;
+  position:fixed; left:0; right:0; bottom:70px; z-index:500;
   padding:22px 0 calc(16px + env(safe-area-inset-bottom));
   background:linear-gradient(to top, var(--paper) 58%, rgba(250,248,243,.92) 80%, rgba(250,248,243,0));
 }
