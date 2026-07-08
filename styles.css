@@ -601,10 +601,10 @@ body.svejarka-page{ padding-bottom:0; }
   40%{ opacity:1; transform:scale(1); }
 }
 
-/* Composer stays put while you scroll through the conversation, and settles right under the
-   "Чат" title (instead of floating over empty space) once you scroll back up to the top. */
+/* Fixed to the actual screen edge — always sits flush above the tab bar with no gap,
+   regardless of scroll position or the mobile browser's address bar resizing the viewport. */
 .svejarka-composer{
-  position:sticky; bottom:70px; z-index:500;
+  position:fixed; left:0; right:0; bottom:70px; z-index:500;
   padding:18px 0 calc(16px + env(safe-area-inset-bottom));
   background:linear-gradient(to top, var(--paper) 58%, rgba(250,248,243,.92) 80%, rgba(250,248,243,0));
 }
