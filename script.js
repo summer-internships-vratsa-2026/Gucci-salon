@@ -123,9 +123,11 @@ galleryTiles.forEach(tile=>{
   });
 });
 
-lightboxClose.addEventListener('click', closeLightbox);
-lightbox.addEventListener('click', (e)=>{ if (e.target === lightbox) closeLightbox(); });
-document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox(); });
+if (lightbox && lightboxClose) {
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e)=>{ if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox(); });
+}
 
 /* ============================================================
    FACE SHAPE FINDER (upload + draggable overlay + recommendations)
@@ -178,14 +180,17 @@ let currentGender = 'men';
 let currentShape = null;
 let hasPhoto = false;
 
-document.getElementById('genderToggle').addEventListener('click', (e)=>{
-  const btn = e.target.closest('button');
-  if(!btn) return;
-  document.querySelectorAll('#genderToggle button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  currentGender = btn.dataset.gender;
-  if(currentShape) renderRecommendation();
-});
+const genderToggleEl = document.getElementById('genderToggle');
+if (genderToggleEl) {
+  genderToggleEl.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    document.querySelectorAll('#genderToggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentGender = btn.dataset.gender;
+    if(currentShape) renderRecommendation();
+  });
+}
 
 document.querySelectorAll('.fsf-card').forEach(card=>{
   card.addEventListener('click', ()=>{
@@ -240,20 +245,23 @@ function handlePhotoFile(e){
   };
   reader.readAsDataURL(file);
 }
-fsfFileInput.addEventListener('change', handlePhotoFile);
-fsfCameraInput.addEventListener('change', handlePhotoFile);
+if (fsfFileInput) fsfFileInput.addEventListener('change', handlePhotoFile);
+if (fsfCameraInput) fsfCameraInput.addEventListener('change', handlePhotoFile);
 
-document.getElementById('fsfChangePhoto').addEventListener('click', ()=>{
-  fsfPhoto.style.display = 'none';
-  fsfPhoto.src = '';
-  fsfPlaceholder.style.display = 'block';
-  fsfOverlay.style.display = 'none';
-  fsfStageControls.classList.remove('show');
-  fsfDragHint.classList.remove('show');
-  hasPhoto = false;
-  fsfFileInput.value = '';
-  fsfCameraInput.value = '';
-});
+const fsfChangePhotoBtn = document.getElementById('fsfChangePhoto');
+if (fsfChangePhotoBtn) {
+  fsfChangePhotoBtn.addEventListener('click', ()=>{
+    fsfPhoto.style.display = 'none';
+    fsfPhoto.src = '';
+    fsfPlaceholder.style.display = 'block';
+    fsfOverlay.style.display = 'none';
+    fsfStageControls.classList.remove('show');
+    fsfDragHint.classList.remove('show');
+    hasPhoto = false;
+    fsfFileInput.value = '';
+    fsfCameraInput.value = '';
+  });
+}
 
 /* overlay position/scale state — composed into a single transform so drag + slider never conflict */
 let ovX = 0, ovY = 0, ovScale = 1;
@@ -270,28 +278,32 @@ function showOverlay(shape){
   fsfDragHint.classList.add('show');
 }
 
-fsfScale.addEventListener('input', ()=>{
-  ovScale = fsfScale.value / 100;
-  applyOverlayTransform();
-});
+if (fsfScale) {
+  fsfScale.addEventListener('input', ()=>{
+    ovScale = fsfScale.value / 100;
+    applyOverlayTransform();
+  });
+}
 
 /* drag to reposition overlay */
 let dragging = false, startX = 0, startY = 0;
-fsfOverlaySvg.addEventListener('pointerdown', (e)=>{
-  dragging = true;
-  startX = e.clientX - ovX;
-  startY = e.clientY - ovY;
-  fsfOverlaySvg.setPointerCapture(e.pointerId);
-});
-fsfOverlaySvg.addEventListener('pointermove', (e)=>{
-  if(!dragging) return;
-  ovX = e.clientX - startX;
-  ovY = e.clientY - startY;
-  applyOverlayTransform();
-});
-['pointerup','pointercancel'].forEach(ev=>{
-  fsfOverlaySvg.addEventListener(ev, ()=>{ dragging = false; });
-});
+if (fsfOverlaySvg) {
+  fsfOverlaySvg.addEventListener('pointerdown', (e)=>{
+    dragging = true;
+    startX = e.clientX - ovX;
+    startY = e.clientY - ovY;
+    fsfOverlaySvg.setPointerCapture(e.pointerId);
+  });
+  fsfOverlaySvg.addEventListener('pointermove', (e)=>{
+    if(!dragging) return;
+    ovX = e.clientX - startX;
+    ovY = e.clientY - startY;
+    applyOverlayTransform();
+  });
+  ['pointerup','pointercancel'].forEach(ev=>{
+    fsfOverlaySvg.addEventListener(ev, ()=>{ dragging = false; });
+  });
+}
 
 /* ============================================================
    CALCULATOR
