@@ -629,7 +629,7 @@ body.svejarka-page{ padding-bottom:0; }
 }
 .svejarka-inputbar{ display:flex; gap:10px; }
 .svejarka-inputbar input{
-  flex:1; padding:15px 20px; border:1px solid var(--line); border-radius:999px;
+  flex:1; min-width:0; padding:15px 20px; border:1px solid var(--line); border-radius:999px;
   font-family:var(--font-body); font-size:.95rem; background:var(--paper); color:var(--text-dark);
   box-shadow:0 8px 24px rgba(0,0,0,.06);
 }
