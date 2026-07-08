@@ -562,7 +562,12 @@ body{ padding-bottom:70px; }
 .svejarka-wrap{ max-width:760px; margin:0 auto; }
 
 /* Chat messages flow directly on the page — no boxed card, just a running conversation */
-.svejarka-chat-section{ padding-top:48px; padding-bottom:200px; }
+.svejarka-chat-section{ padding-top:48px; padding-bottom:160px; }
+
+.svejarka-chat-title{
+  font-family:var(--font-display); font-weight:600; font-size:1.5rem;
+  text-align:center; color:var(--text-dark); margin-bottom:26px;
+}
 
 .svejarka-chat{
   display:flex; flex-direction:column; gap:20px;
@@ -590,10 +595,11 @@ body{ padding-bottom:70px; }
   40%{ opacity:1; transform:scale(1); }
 }
 
-/* Composer stays fixed to the viewport at all times, the same way this chat's own input box behaves. */
+/* Composer stays put while you scroll through the conversation, and settles right under the
+   "Чат" title (instead of floating over empty space) once you scroll back up to the top. */
 .svejarka-composer{
-  position:fixed; left:0; right:0; bottom:70px; z-index:500;
-  padding:22px 0 calc(16px + env(safe-area-inset-bottom));
+  position:sticky; bottom:70px; z-index:500;
+  padding:18px 0 calc(16px + env(safe-area-inset-bottom));
   background:linear-gradient(to top, var(--paper) 58%, rgba(250,248,243,.92) 80%, rgba(250,248,243,0));
 }
 .svejarka-inputbar{ display:flex; gap:10px; }
@@ -609,11 +615,9 @@ body{ padding-bottom:70px; }
 }
 .svejarka-inputbar button:disabled{ opacity:.5; cursor:not-allowed; transform:none !important; }
 
-.svejarka-disclaimer{ margin-top:12px; font-size:.78rem; color:var(--muted); text-align:center; line-height:1.5; }
-
 @media (max-width:700px){
   .svejarka-hero{ padding-top:96px; }
-  .svejarka-chat-section{ padding-bottom:220px; }
+  .svejarka-chat-section{ padding-bottom:180px; }
 }
 
 @media (min-width:900px){
