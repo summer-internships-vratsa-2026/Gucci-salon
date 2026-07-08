@@ -8,15 +8,15 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GE
 
 const MAX_MESSAGE_LEN = 500;   // guards against oversized requests / cost spikes
 const MAX_HISTORY_TURNS = 8;   // only the recent context is sent to Gemini
-const MAX_OUTPUT_TOKENS = 500; // keeps replies focused and cheap to serve
+const MAX_OUTPUT_TOKENS = 800; // this now covers only the visible reply (thinking is disabled below)
 
 const SYSTEM_PROMPT = `Ти си Svejarka AI — виртуалният стил-консултант на Gucci Salon, фризьорски салон в центъра на Мездра.
-Говориш на български, топло, приятелски, но винаги полезно и по същество като се обръщаш с неутрални местоимения, освен ако не се напълно сигурен дали е мъж или жена и.
+Говориш на български, топло, приятелски и с лека игривост, но винаги полезно и по същество.
 
 Твоята роля:
 - Даваш общи съвети за прически, форма на лицето, брада и мустаци, грижа за коса, боядисване, тенденции и стилизиращи продукти.
 - Ако липсва достатъчно информация (форма на лицето, дължина/тип коса, начин на живот), задаваш 1-2 кратки уточняващи въпроса, преди да препоръчаш нещо конкретно.
-- Пишеш кратко и ясно — при изброяване на опции използвай кратки водещи точки вместо дълъг текст.
+- Пишеш кратко и ясно — обикновено 3 до 6 изречения; при изброяване на опции използвай кратки водещи точки вместо дълъг текст.
 - Винаги завършваш конкретна препоръка с покана да запазят час в Gucci Salon, за да я изпълнят професионално на място.
 
 Граници:
@@ -73,6 +73,11 @@ export async function POST(request) {
     generationConfig: {
       maxOutputTokens: MAX_OUTPUT_TOKENS,
       temperature: 0.8,
+      // Gemini 2.5 Flash "thinks" internally by default, and those thinking
+      // tokens are deducted from the same maxOutputTokens budget as the
+      // visible reply — which was cutting answers off mid-sentence.
+      // This assistant doesn't need multi-step reasoning, so disable it.
+      thinkingConfig: { thinkingBudget: 0 },
     },
   };
 
@@ -105,9 +110,16 @@ export async function POST(request) {
   }
 
   const data = await geminiRes.json();
-  const reply =
-    data?.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('').trim() ||
-    'Извинявам се, не успях да генерирам отговор. Опитайте да зададете въпроса по друг начин.';
+  const candidate = data?.candidates?.[0];
+  let reply = candidate?.content?.parts?.map((p) => p.text || '').join('').trim();
+
+  if (!reply) {
+    reply = 'Извинявам се, не успях да генерирам отговор. Опитайте да зададете въпроса по друг начин.';
+  } else if (candidate?.finishReason === 'MAX_TOKENS') {
+    // Safety net: reply got cut off before finishing. Let the user know
+    // plainly rather than silently showing a truncated sentence.
+    reply += '\n\n[Отговорът беше прекъснат — можеш да напишеш "продължи", за да довърша мисълта.]';
+  }
 
   return Response.json({ reply });
 }
