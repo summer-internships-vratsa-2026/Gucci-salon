@@ -8,7 +8,6 @@
   const form = document.getElementById('svejarkaForm');
   const input = document.getElementById('svejarkaInput');
   const sendBtn = document.getElementById('svejarkaSend');
-  const chips = document.getElementById('svejarkaChips');
   if (!chatEl || !form || !input || !sendBtn) return;
 
   const MAX_HISTORY_SENT = 8; // keep upload payload small as the chat grows
@@ -89,12 +88,4 @@
     e.preventDefault();
     sendMessage(input.value);
   });
-
-  if (chips){
-    chips.addEventListener('click', (e)=>{
-      const btn = e.target.closest('[data-prompt]');
-      if (!btn) return;
-      sendMessage(btn.dataset.prompt);
-    });
-  }
 })();
