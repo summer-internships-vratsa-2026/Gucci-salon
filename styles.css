@@ -517,6 +517,9 @@ section[id]{ scroll-margin-top: var(--header-h); }
   content:""; position:absolute; top:-9px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--gold);
 }
 body{ padding-bottom:70px; }
+/* Svejarka's composer already reserves its own space above the tab bar (see .svejarka-composer),
+   so the generic body clearance would double up and leave an empty gap beneath it. */
+body.svejarka-page{ padding-bottom:0; }
 
 /* ============================================================
    13. RESPONSIVE
@@ -565,9 +568,12 @@ body{ padding-bottom:70px; }
 .svejarka-chat-section{ padding-top:48px; padding-bottom:160px; }
 
 .svejarka-chat-title{
-  font-family:var(--font-display); font-weight:600; font-size:1.5rem;
-  text-align:center; color:var(--text-dark); margin-bottom:26px;
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  font-family:var(--font-display); font-weight:600; font-size:1.7rem;
+  text-align:center; color:var(--text-dark); margin-bottom:30px; letter-spacing:.01em;
 }
+.svejarka-chat-title i{ color:var(--gold); font-size:1.2rem; }
+.svejarka-chat-title span{ color:var(--gold-deep); }
 
 .svejarka-chat{
   display:flex; flex-direction:column; gap:20px;
