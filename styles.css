@@ -30,6 +30,9 @@
      was assumed. */
   --tabbar-h: 64px;
   --tabbar-total-h: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
+  /* Fallback for first paint before JS measures the real composer height
+     (see svejarka.js ResizeObserver) — roughly matches the no-preview state. */
+  --composer-h: 96px;
 }
 
 *{box-sizing:border-box; margin:0; padding:0;}
@@ -544,7 +547,7 @@ body.svejarka-page{ padding-bottom:0; }
   .footer-top{ flex-direction:row; justify-content:space-between; }
 }
 @media (min-width:900px){
-  :root{ --header-h:86px; }
+  :root{ --header-h:86px; --tabbar-total-h:0px; }
   .desktop-nav{ display:block; }
   .burger{ display:none; }
   .section{ padding:100px 0; }
@@ -573,8 +576,12 @@ body.svejarka-page{ padding-bottom:0; }
 
 .svejarka-wrap{ max-width:760px; margin:0 auto; }
 
-/* Chat messages flow directly on the page — no boxed card, just a running conversation */
-.svejarka-chat-section{ padding-top:48px; padding-bottom:160px; }
+/* Chat messages flow directly on the page — no boxed card, just a running conversation.
+   Bottom clearance = tab bar height + the composer's real height (measured live by
+   a ResizeObserver in svejarka.js, since the composer grows when a photo preview
+   appears) + a small gap, so nothing is ever hidden behind the fixed composer
+   regardless of whether a photo is attached. */
+.svejarka-chat-section{ padding-top:48px; padding-bottom:calc(var(--tabbar-total-h) + var(--composer-h) + 24px); }
 
 .svejarka-chat-title{
   display:flex; align-items:center; justify-content:center; gap:12px;
@@ -644,8 +651,13 @@ body.svejarka-page{ padding-bottom:0; }
   display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:8px 12px;
   background:var(--paper-2); border:1px solid var(--line); border-radius:14px;
 }
+/* The [hidden] attribute is how JS shows/hides this box. Author rules always
+   beat the browser's built-in "[hidden]{display:none}" rule, so without this
+   override the box would ignore `hidden` entirely and stay visible forever
+   — which is exactly what was happening. */
+.svejarka-preview[hidden]{ display:none; }
 .svejarka-preview img{ width:40px; height:40px; object-fit:cover; border-radius:8px; flex-shrink:0; }
-.svejarka-preview span{ font-size:.82rem; color:var(--muted); flex:1; }
+.svejarka-preview span{ font-size:.82rem; color:var(--muted); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .svejarka-preview-remove{
   width:26px; height:26px; border-radius:50%; padding:0; flex-shrink:0;
   display:flex; align-items:center; justify-content:center; font-size:.75rem;
@@ -661,7 +673,6 @@ body.svejarka-page{ padding-bottom:0; }
 
 @media (max-width:700px){
   .svejarka-hero{ padding-top:96px; }
-  .svejarka-chat-section{ padding-bottom:180px; }
 }
 
 @media (min-width:900px){

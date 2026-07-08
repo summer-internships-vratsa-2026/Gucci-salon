@@ -29,7 +29,21 @@
   const previewWrap = document.getElementById('svejarkaPreview');
   const previewImg = document.getElementById('svejarkaPreviewImg');
   const previewRemove = document.getElementById('svejarkaPreviewRemove');
+  const composerEl = document.querySelector('.svejarka-composer');
   if (!chatEl || !form || !input || !sendBtn) return;
+
+  // The composer grows taller when a photo preview appears above the input
+  // row. Rather than guessing a fixed pixel value for how much space to
+  // reserve at the bottom of the chat feed, measure the composer's real
+  // rendered height live and expose it as a CSS variable that the chat
+  // section's padding-bottom reads from (see styles.css --composer-h).
+  if (composerEl && typeof ResizeObserver === 'function'){
+    const reportComposerHeight = () => {
+      document.documentElement.style.setProperty('--composer-h', composerEl.offsetHeight + 'px');
+    };
+    new ResizeObserver(reportComposerHeight).observe(composerEl);
+    reportComposerHeight();
+  }
 
   const MAX_HISTORY_SENT = 8;          // keep upload payload small as the chat grows
   const MAX_SOURCE_MB = 20;            // reject absurdly large source files before we even try to decode them
@@ -102,7 +116,7 @@
 
   function clearPendingImage(){
     pendingImage = null;
-    if (previewImg) previewImg.src = '';
+    if (previewImg) previewImg.removeAttribute('src');
     if (previewWrap) previewWrap.hidden = true;
     if (attachBtn) attachBtn.classList.remove('has-image');
   }
