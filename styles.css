@@ -633,6 +633,32 @@ body.svejarka-page{ padding-bottom:0; }
 }
 .svejarka-inputbar button:disabled{ opacity:.5; cursor:not-allowed; transform:none !important; }
 
+.svejarka-attach{
+  background:var(--ink-2); color:var(--gold-light); border:1px solid var(--line);
+  transition:background .3s, border-color .3s, color .3s;
+}
+.svejarka-attach:hover{ background:var(--ink-3); }
+.svejarka-attach.has-image{ color:#1a1408; background:linear-gradient(135deg,var(--gold-light),var(--gold)); border-color:transparent; }
+
+.svejarka-preview{
+  display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:8px 12px;
+  background:var(--paper-2); border:1px solid var(--line); border-radius:14px;
+}
+.svejarka-preview img{ width:40px; height:40px; object-fit:cover; border-radius:8px; flex-shrink:0; }
+.svejarka-preview span{ font-size:.82rem; color:var(--muted); flex:1; }
+.svejarka-preview-remove{
+  width:26px; height:26px; border-radius:50%; padding:0; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:.75rem;
+  background:transparent; color:var(--muted); border:1px solid var(--line);
+}
+.svejarka-preview-remove:hover{ color:var(--text-dark); border-color:var(--gold); }
+
+/* A photo the client sent, shown inline inside their own chat bubble */
+.svejarka-bubble img.svejarka-msg-img{
+  display:block; max-width:200px; max-height:200px; width:100%; height:auto;
+  border-radius:12px; object-fit:cover; margin-bottom:8px;
+}
+
 @media (max-width:700px){
   .svejarka-hero{ padding-top:96px; }
   .svejarka-chat-section{ padding-bottom:180px; }

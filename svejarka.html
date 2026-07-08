@@ -87,8 +87,15 @@
 
 <div class="svejarka-composer">
   <div class="container svejarka-wrap">
+    <div class="svejarka-preview" id="svejarkaPreview" hidden>
+      <img id="svejarkaPreviewImg" alt="Преглед на снимката">
+      <span>Снимката е прикачена</span>
+      <button type="button" class="svejarka-preview-remove" id="svejarkaPreviewRemove" aria-label="Премахни снимката"><i class="fa-solid fa-xmark"></i></button>
+    </div>
     <form class="svejarka-inputbar" id="svejarkaForm">
-      <input type="text" id="svejarkaInput" maxlength="500" placeholder="Напиши въпрос за прическа, брада, боя..." autocomplete="off" required>
+      <input type="file" id="svejarkaFile" accept="image/*" hidden>
+      <button type="button" class="svejarka-attach" id="svejarkaAttachBtn" aria-label="Прикачи снимка"><i class="fa-solid fa-camera"></i></button>
+      <input type="text" id="svejarkaInput" maxlength="500" placeholder="Напиши въпрос или прикачи снимка..." autocomplete="off">
       <button type="submit" class="btn btn-gold" id="svejarkaSend" aria-label="Изпрати"><i class="fa-solid fa-paper-plane"></i></button>
     </form>
   </div>
