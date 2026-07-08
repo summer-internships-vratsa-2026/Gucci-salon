@@ -559,26 +559,26 @@ body{ padding-bottom:70px; }
 .svejarka-title span{ color:var(--gold-light); }
 .svejarka-hero .lede{ max-width:56ch; margin:16px auto 0; color:var(--muted-dark); line-height:1.65; }
 
-.svejarka-wrap{ max-width:760px; }
+.svejarka-wrap{ max-width:760px; margin:0 auto; }
+
+/* Chat messages flow directly on the page — no boxed card, just a running conversation */
+.svejarka-chat-section{ padding-top:48px; padding-bottom:200px; }
 
 .svejarka-chat{
-  display:flex; flex-direction:column; gap:14px;
-  background:var(--paper-2); border:1px solid var(--line); border-radius:8px;
-  padding:20px; height:440px; overflow-y:auto; margin-bottom:16px;
-  scroll-behavior:smooth;
+  display:flex; flex-direction:column; gap:20px;
 }
 .svejarka-msg{ display:flex; }
 .svejarka-msg.user{ justify-content:flex-end; }
 .svejarka-bubble{
-  max-width:80%; padding:12px 16px; border-radius:14px;
-  line-height:1.55; font-size:.92rem; white-space:pre-wrap;
+  max-width:80%; padding:13px 18px; border-radius:16px;
+  line-height:1.6; font-size:.95rem; white-space:pre-wrap;
 }
 .svejarka-msg.bot .svejarka-bubble{ background:var(--ink); color:var(--cream); border-bottom-left-radius:4px; }
 .svejarka-msg.user .svejarka-bubble{
   background:linear-gradient(135deg,var(--gold-light),var(--gold)); color:#1a1408;
   border-bottom-right-radius:4px;
 }
-.svejarka-bubble.svejarka-typing{ display:flex; gap:5px; align-items:center; padding:14px 16px; }
+.svejarka-bubble.svejarka-typing{ display:flex; gap:5px; align-items:center; padding:15px 18px; }
 .svejarka-bubble.svejarka-typing span{
   width:6px; height:6px; border-radius:50%; background:var(--gold-light);
   animation:svejarkaBlink 1.2s infinite ease-in-out;
@@ -590,10 +590,18 @@ body{ padding-bottom:70px; }
   40%{ opacity:1; transform:scale(1); }
 }
 
+/* Composer floats and stays pinned to the bottom of the viewport while messages scroll beneath it,
+   the same way this chat's own message box behaves. */
+.svejarka-composer{
+  position:sticky; bottom:70px; z-index:500;
+  padding:22px 0 calc(16px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top, var(--paper) 58%, rgba(250,248,243,.92) 80%, rgba(250,248,243,0));
+}
 .svejarka-inputbar{ display:flex; gap:10px; }
 .svejarka-inputbar input{
-  flex:1; padding:14px 18px; border:1px solid var(--line); border-radius:999px;
+  flex:1; padding:15px 20px; border:1px solid var(--line); border-radius:999px;
   font-family:var(--font-body); font-size:.95rem; background:var(--paper); color:var(--text-dark);
+  box-shadow:0 8px 24px rgba(0,0,0,.06);
 }
 .svejarka-inputbar input:focus{ outline:none; border-color:var(--gold); }
 .svejarka-inputbar button{
@@ -602,9 +610,13 @@ body{ padding-bottom:70px; }
 }
 .svejarka-inputbar button:disabled{ opacity:.5; cursor:not-allowed; transform:none !important; }
 
-.svejarka-disclaimer{ margin-top:14px; font-size:.78rem; color:var(--muted); text-align:center; line-height:1.5; }
+.svejarka-disclaimer{ margin-top:12px; font-size:.78rem; color:var(--muted); text-align:center; line-height:1.5; }
 
 @media (max-width:700px){
   .svejarka-hero{ padding-top:96px; }
-  .svejarka-chat{ height:58vh; }
+  .svejarka-chat-section{ padding-bottom:220px; }
+}
+
+@media (min-width:900px){
+  .svejarka-composer{ bottom:0; }
 }

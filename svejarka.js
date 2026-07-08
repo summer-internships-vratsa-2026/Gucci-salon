@@ -14,6 +14,12 @@
   let history = []; // {role:'user'|'model', text:string}
   let busy = false;
 
+  function scrollToLatest(){
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    });
+  }
+
   function addMessage(role, text){
     const wrap = document.createElement('div');
     wrap.className = 'svejarka-msg ' + (role === 'user' ? 'user' : 'bot');
@@ -22,7 +28,7 @@
     bubble.textContent = text;
     wrap.appendChild(bubble);
     chatEl.appendChild(wrap);
-    chatEl.scrollTop = chatEl.scrollHeight;
+    scrollToLatest();
     return bubble;
   }
 
@@ -32,7 +38,7 @@
     wrap.id = 'svejarkaTyping';
     wrap.innerHTML = '<div class="svejarka-bubble svejarka-typing"><span></span><span></span><span></span></div>';
     chatEl.appendChild(wrap);
-    chatEl.scrollTop = chatEl.scrollHeight;
+    scrollToLatest();
   }
 
   function removeTyping(){
