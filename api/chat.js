@@ -10,13 +10,23 @@ const MAX_MESSAGE_LEN = 500;   // guards against oversized requests / cost spike
 const MAX_HISTORY_TURNS = 8;   // only the recent context is sent to Gemini
 const MAX_OUTPUT_TOKENS = 800; // this now covers only the visible reply (thinking is disabled below)
 
+// Images arrive already compressed by the client (see svejarka.js), but the
+// server re-validates independently — never trust the client alone. This cap
+// is generous relative to what the client actually sends (client target is
+// ~350KB before base64) purely as a safety net against a modified/direct
+// request, while staying comfortably under Vercel's hard 4.5MB function
+// payload limit.
+const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
 const SYSTEM_PROMPT = `Ти си Svejarka AI — виртуалният стил-консултант на Gucci Salon, фризьорски салон в центъра на Мездра.
 Говориш на български, топло, приятелски, но винаги полезно и по същество.
 
 Твоята роля:
 - Ти си мъж специалист на тема коса и красота.
 - Даваш общи съвети за прически, форма на лицето, брада и мустаци, грижа за коса, боядисване, тенденции и стилизиращи продукти.
-- Ако липсва достатъчно информация (форма на лицето, дължина/тип коса, начин на живот), задаваш 1-2 кратки уточняващи въпроса, преди да препоръчаш нещо конкретно.
+- Ако клиентът прикачи снимка, разгледай я директно — коментирай формата на лицето, дължината/текстурата на косата или брадата, каквото е видимо — и давай съвети съобразени с това, което виждаш, вместо да задаваш въпроси, на които снимката вече отговаря.
+- Ако липсва достатъчно информация (форма на лицето, дължина/тип коса, начин на живот) и няма снимка, задаваш 1-2 кратки уточняващи въпроса, преди да препоръчаш нещо конкретно.
 - Пишеш кратко и ясно — обикновено 3 до 6 изречения; при изброяване на опции използвай кратки водещи точки вместо дълъг текст.
 - Винаги завършваш конкретна препоръка с покана да запазят час в Gucci Salon, за да я изпълнят професионално на място.
 
@@ -39,10 +49,32 @@ export async function POST(request) {
   }
 
   const userMessage = typeof body?.message === 'string' ? body.message.trim() : '';
-  if (!userMessage) return badRequest('Съобщението е празно.');
   if (userMessage.length > MAX_MESSAGE_LEN) {
     return badRequest(`Съобщението е твърде дълго (макс. ${MAX_MESSAGE_LEN} символа).`);
   }
+
+  let imagePart = null;
+  const rawImage = body?.image;
+  if (rawImage && typeof rawImage === 'object') {
+    const mimeType = typeof rawImage.mimeType === 'string' ? rawImage.mimeType.toLowerCase() : '';
+    const data = typeof rawImage.data === 'string' ? rawImage.data : '';
+
+    if (!ALLOWED_IMAGE_TYPES.has(mimeType)) {
+      return badRequest('Неподдържан формат на снимката.');
+    }
+    if (!data) {
+      return badRequest('Липсват данни за снимката.');
+    }
+    // Approximate decoded size from the base64 string length, avoiding an
+    // extra full Buffer allocation just to measure it.
+    const approxBytes = data.length * 0.75;
+    if (approxBytes > MAX_IMAGE_BYTES) {
+      return badRequest('Снимката е твърде голяма.');
+    }
+    imagePart = { inlineData: { mimeType, data } };
+  }
+
+  if (!userMessage && !imagePart) return badRequest('Съобщението е празно.');
 
   const rawHistory = Array.isArray(body?.history) ? body.history : [];
   const history = rawHistory
@@ -68,8 +100,12 @@ export async function POST(request) {
     );
   }
 
+  const userParts = [];
+  if (imagePart) userParts.push(imagePart);
+  userParts.push({ text: userMessage || 'Ето снимка на косата/лицето ми. Какво би препоръчал?' });
+
   const payload = {
-    contents: [...history, { role: 'user', parts: [{ text: userMessage }] }],
+    contents: [...history, { role: 'user', parts: userParts }],
     systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
     generationConfig: {
       maxOutputTokens: MAX_OUTPUT_TOKENS,
