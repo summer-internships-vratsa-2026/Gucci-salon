@@ -3,7 +3,7 @@
 // Keeps the Gemini API key on the server and proxies chat requests for
 // "Svejarka AI" — the haircut/style advice assistant on the Gucci Salon site.
 
-const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_MODEL = 'gemini-3.1-flash-lite';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const MAX_MESSAGE_LEN = 500;   // guards against oversized requests / cost spikes
