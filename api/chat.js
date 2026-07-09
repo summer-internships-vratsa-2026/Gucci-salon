@@ -2,13 +2,19 @@
 // Vercel serverless function (Node.js runtime, Web Handler signature).
 // Keeps the Gemini API key on the server and proxies chat requests for
 // "Svejarka AI" — the haircut/style advice assistant on the Gucci Salon site.
+// Uses gemini-3.1-flash-lite (see model choice note below).
 
+// gemini-2.5-flash was shut down by Google ("This model ... is no longer
+// available") — migrated to gemini-3.1-flash-lite: stable (not preview),
+// multimodal (text+image), and guaranteed supported through at least
+// May 2027 per Google's deprecation schedule. It's the budget/low-latency
+// tier of the Gemini 3 line, matching what 2.5 Flash was for the 2.5 line.
 const GEMINI_MODEL = 'gemini-3.1-flash-lite';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 const MAX_MESSAGE_LEN = 500;   // guards against oversized requests / cost spikes
 const MAX_HISTORY_TURNS = 8;   // only the recent context is sent to Gemini
-const MAX_OUTPUT_TOKENS = 800; // this now covers only the visible reply (thinking is disabled below)
+const MAX_OUTPUT_TOKENS = 800; // this now covers only the visible reply (thinking is set to minimal below)
 
 // Images arrive already compressed by the client (see svejarka.js), but the
 // server re-validates independently — never trust the client alone. This cap
@@ -18,6 +24,48 @@ const MAX_OUTPUT_TOKENS = 800; // this now covers only the visible reply (thinki
 // payload limit.
 const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+// --- Abuse guard ------------------------------------------------------------
+// This is a cheap, best-effort layer that lives inside this function — it
+// only protects THIS endpoint's Gemini spend/quota, which Vercel's own
+// Firewall has no visibility into (Vercel protects Vercel's bill, not a
+// third-party API key behind your code). It is NOT a substitute for
+// Vercel's platform-level DDoS protection:
+//   - Enable "Attack Mode" in the dashboard (Firewall → Bot Management)
+//     during an active attack — free on every plan, challenges all visitors.
+//   - Add a Custom Rule (Firewall → WAF, up to 3 on Hobby) to rate-limit or
+//     challenge traffic to /api/chat specifically.
+//   - Traffic that the Vercel Firewall blocks/challenges does NOT count
+//     against Fast Data Transfer — traffic that reaches this function does.
+// The state below only persists for the lifetime of one warm serverless
+// instance (resets on cold start, isn't shared across concurrent instances),
+// so it won't stop a large distributed attack on its own — that's what the
+// dashboard-level tools above are for.
+const ALLOWED_ORIGINS = ['https://guccisalon.com', 'https://www.guccisalon.com'];
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_PER_IP = 8; // chat messages per IP per minute
+const rateLimitHits = new Map(); // ip -> timestamps[]
+
+function isAllowedOrigin(request) {
+  const origin = request.headers.get('origin') || '';
+  const referer = request.headers.get('referer') || '';
+  // Fetch always sets Origin on POST requests (even cross-context/private
+  // browsing), so a request with neither header is almost certainly a
+  // script hitting the URL directly rather than a real page load.
+  if (origin) return ALLOWED_ORIGINS.includes(origin);
+  if (referer) return ALLOWED_ORIGINS.some((o) => referer.startsWith(o));
+  return false;
+}
+
+function isRateLimited(request) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const now = Date.now();
+  const recent = (rateLimitHits.get(ip) || []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  recent.push(now);
+  rateLimitHits.set(ip, recent);
+  if (rateLimitHits.size > 5000) rateLimitHits.clear(); // guard against unbounded growth
+  return recent.length > RATE_LIMIT_MAX_PER_IP;
+}
 
 const SYSTEM_PROMPT = `Ти си Svejarka AI — виртуалният стил-консултант на Gucci Salon, фризьорски салон в центъра на Мездра.
 Говориш на български, топло, приятелски, но винаги полезно и по същество.
@@ -41,6 +89,16 @@ function badRequest(message) {
 }
 
 export async function POST(request) {
+  if (!isAllowedOrigin(request)) {
+    return Response.json({ error: 'Невалидна заявка.' }, { status: 403 });
+  }
+  if (isRateLimited(request)) {
+    return Response.json(
+      { error: 'Твърде много съобщения. Изчакай малко и опитай пак.' },
+      { status: 429 }
+    );
+  }
+
   let body;
   try {
     body = await request.json();
@@ -110,11 +168,13 @@ export async function POST(request) {
     generationConfig: {
       maxOutputTokens: MAX_OUTPUT_TOKENS,
       temperature: 0.8,
-      // Gemini 2.5 Flash "thinks" internally by default, and those thinking
-      // tokens are deducted from the same maxOutputTokens budget as the
-      // visible reply — which was cutting answers off mid-sentence.
-      // This assistant doesn't need multi-step reasoning, so disable it.
-      thinkingConfig: { thinkingBudget: 0 },
+      // Gemini 3 models use `thinkingLevel`, not the 2.5-series `thinkingBudget`
+      // (which Gemini 3 doesn't fully honor). 'minimal' is the lowest setting
+      // gemini-3.1-flash-lite supports — closest to the old "thinking off"
+      // behavior we relied on to keep replies fast and cheap. It's also this
+      // model's default, so this is mostly here to be explicit and future-proof
+      // in case Google changes the default later.
+      thinkingConfig: { thinkingLevel: 'minimal' },
     },
   };
 
