@@ -25,7 +25,11 @@
   const input = document.getElementById('svejarkaInput');
   const sendBtn = document.getElementById('svejarkaSend');
   const attachBtn = document.getElementById('svejarkaAttachBtn');
+  const attachMenu = document.getElementById('svejarkaAttachMenu');
+  const attachGalleryOpt = document.getElementById('svejarkaAttachGallery');
+  const attachCameraOpt = document.getElementById('svejarkaAttachCamera');
   const fileInput = document.getElementById('svejarkaFile');
+  const cameraInput = document.getElementById('svejarkaFileCamera');
   const previewWrap = document.getElementById('svejarkaPreview');
   const previewImg = document.getElementById('svejarkaPreviewImg');
   const previewRemove = document.getElementById('svejarkaPreviewRemove');
@@ -103,6 +107,7 @@
     sendBtn.disabled = state;
     input.disabled = state;
     if (attachBtn) attachBtn.disabled = state;
+    if (state) closeAttachMenu();
   }
 
   function setPendingImage(dataUrl){
@@ -167,32 +172,97 @@
     return dataUrl;
   }
 
-  if (attachBtn && fileInput){
-    attachBtn.addEventListener('click', () => fileInput.click());
+  // Shared by both the gallery picker and the direct-camera capture — same
+  // validation and client-side compression either way, only the source input differs.
+  async function handleSelectedFile(file, triggerBtn){
+    if (!file) return;
 
-    fileInput.addEventListener('change', async () => {
+    if (!file.type.startsWith('image/')){
+      addMessage('bot', 'Може да прикачиш само снимка (JPG, PNG, WEBP).');
+      return;
+    }
+    if (file.size > MAX_SOURCE_MB * 1024 * 1024){
+      addMessage('bot', `Снимката е твърде голяма (макс. ${MAX_SOURCE_MB}MB).`);
+      return;
+    }
+
+    if (triggerBtn) triggerBtn.disabled = true;
+    try{
+      const dataUrl = await compressImage(file);
+      setPendingImage(dataUrl);
+    } catch (err){
+      addMessage('bot', 'Не успях да обработя снимката. Опитай с друга.');
+    } finally {
+      if (triggerBtn) triggerBtn.disabled = false;
+    }
+  }
+
+  // Single button opens a tiny menu with the two real sources — a file (gallery/
+  // files app) or the device camera directly — instead of guessing which one
+  // the visitor wants or relying on the OS's own (inconsistent across
+  // browsers) file-picker chooser.
+  function openAttachMenu(){
+    if (!attachMenu) return;
+    attachMenu.hidden = false;
+    if (attachBtn) attachBtn.setAttribute('aria-expanded', 'true');
+    document.addEventListener('click', onDocClickCloseMenu, true);
+    document.addEventListener('keydown', onKeydownCloseMenu, true);
+  }
+
+  function closeAttachMenu(){
+    if (!attachMenu) return;
+    attachMenu.hidden = true;
+    if (attachBtn) attachBtn.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('click', onDocClickCloseMenu, true);
+    document.removeEventListener('keydown', onKeydownCloseMenu, true);
+  }
+
+  function onDocClickCloseMenu(e){
+    if (attachMenu && attachMenu.contains(e.target)) return;
+    if (attachBtn && attachBtn.contains(e.target)) return;
+    closeAttachMenu();
+  }
+
+  function onKeydownCloseMenu(e){
+    if (e.key === 'Escape'){
+      closeAttachMenu();
+      if (attachBtn) attachBtn.focus();
+    }
+  }
+
+  if (attachBtn && attachMenu){
+    attachBtn.addEventListener('click', () => {
+      if (attachMenu.hidden) openAttachMenu(); else closeAttachMenu();
+    });
+  }
+
+  if (attachGalleryOpt && fileInput){
+    attachGalleryOpt.addEventListener('click', () => {
+      closeAttachMenu();
+      fileInput.click();
+    });
+  }
+
+  if (attachCameraOpt && cameraInput){
+    attachCameraOpt.addEventListener('click', () => {
+      closeAttachMenu();
+      cameraInput.click();
+    });
+  }
+
+  if (fileInput){
+    fileInput.addEventListener('change', () => {
       const file = fileInput.files && fileInput.files[0];
       fileInput.value = ''; // allow re-selecting the same file later
-      if (!file) return;
+      handleSelectedFile(file, attachBtn);
+    });
+  }
 
-      if (!file.type.startsWith('image/')){
-        addMessage('bot', 'Може да прикачиш само снимка (JPG, PNG, WEBP).');
-        return;
-      }
-      if (file.size > MAX_SOURCE_MB * 1024 * 1024){
-        addMessage('bot', `Снимката е твърде голяма (макс. ${MAX_SOURCE_MB}MB).`);
-        return;
-      }
-
-      attachBtn.disabled = true;
-      try{
-        const dataUrl = await compressImage(file);
-        setPendingImage(dataUrl);
-      } catch (err){
-        addMessage('bot', 'Не успях да обработя снимката. Опитай с друга.');
-      } finally {
-        attachBtn.disabled = false;
-      }
+  if (cameraInput){
+    cameraInput.addEventListener('change', () => {
+      const file = cameraInput.files && cameraInput.files[0];
+      cameraInput.value = ''; // allow capturing another photo later
+      handleSelectedFile(file, attachBtn);
     });
   }
 

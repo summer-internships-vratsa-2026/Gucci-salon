@@ -93,9 +93,16 @@
       <button type="button" class="svejarka-preview-remove" id="svejarkaPreviewRemove" aria-label="Премахни снимката"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <form class="svejarka-inputbar" id="svejarkaForm">
+      <input type="file" id="svejarkaFileCamera" accept="image/*" capture="environment" hidden>
       <input type="file" id="svejarkaFile" accept="image/*" hidden>
       <input type="text" id="svejarkaInput" maxlength="500" placeholder="Напиши въпрос или прикачи снимка..." autocomplete="off">
-      <button type="button" class="svejarka-attach" id="svejarkaAttachBtn" aria-label="Прикачи снимка"><i class="fa-solid fa-camera"></i></button>
+      <div class="svejarka-attach-wrap">
+        <button type="button" class="svejarka-attach" id="svejarkaAttachBtn" aria-haspopup="true" aria-expanded="false" aria-label="Прикачи снимка"><i class="fa-solid fa-camera"></i></button>
+        <div class="svejarka-attach-menu" id="svejarkaAttachMenu" hidden>
+          <button type="button" id="svejarkaAttachGallery"><i class="fa-solid fa-image"></i>Качи файл</button>
+          <button type="button" id="svejarkaAttachCamera"><i class="fa-solid fa-camera"></i>Направи снимка</button>
+        </div>
+      </div>
       <button type="submit" class="btn btn-gold" id="svejarkaSend" aria-label="Изпрати"><i class="fa-solid fa-paper-plane"></i></button>
     </form>
   </div>
