@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Svejarka AI — AI съветник за прически | Gucci Salon Мездра</title>
+<meta name="description" content="Svejarka AI — безплатен виртуален стил-консултант на Gucci Salon Мездра. Питай за прическа, брада, боя или грижа за косата.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500;1,600&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- Vercel Web Analytics -->
+<script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+
+<link rel="stylesheet" href="styles.css">
+<!-- Vercel Web Analytics -->
+<script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+</head>
+<body class="svejarka-page">
+
+<!-- HEADER -->
+<header class="site-header" id="siteHeader">
+  <a href="index.html#home" class="brand" data-nav="home">
+    <span class="mark"><i class="fa-solid fa-scissors"></i></span>
+    <span class="word">GUCCI SALON<small>Мездра</small></span>
+  </a>
+  <nav class="desktop-nav">
+    <ul>
+      <li><a href="svejarka.html" class="active">Svejarka AI</a></li>
+      <li><a href="index.html#home" data-nav="home">Начало</a></li>
+      <li><a href="index.html#men" data-nav="men">Мъжко</a></li>
+      <li><a href="index.html#women" data-nav="women">Дамско</a></li>
+      <li><a href="index.html#gallery" data-nav="gallery">Галерия</a></li>
+      <li><a href="index.html#faceshape" data-nav="faceshape">Какво ми отива?</a></li>
+      <li><a href="index.html#calculator" data-nav="calculator">Калкулатор</a></li>
+      <li><a href="index.html#barbers" data-nav="barbers">Екип</a></li>
+      <li><a href="index.html#contact" data-nav="contact">Контакти</a></li>
+    </ul>
+  </nav>
+  <button class="burger" id="burgerBtn" aria-label="Меню"><i class="fa-solid fa-bars"></i></button>
+</header>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="mobile-drawer" id="mobileDrawer">
+  <div class="drawer-top"><button class="drawer-close" id="drawerClose"><i class="fa-solid fa-xmark"></i></button></div>
+  <nav>
+    <ul>
+      <li><a href="index.html#home" data-nav="home"><i class="fa-solid fa-house"></i>Начало</a></li>
+      <li><a href="index.html#men" data-nav="men"><i class="fa-solid fa-scissors"></i>Мъжко подстригване</a></li>
+      <li><a href="index.html#women" data-nav="women"><i class="fa-solid fa-spa"></i>Дамско подстригване</a></li>
+      <li><a href="index.html#gallery" data-nav="gallery"><i class="fa-solid fa-images"></i>Галерия</a></li>
+      <li><a href="index.html#faceshape" data-nav="faceshape"><i class="fa-solid fa-wand-magic-sparkles"></i>Какво ми отива?</a></li>
+      <li><a href="index.html#calculator" data-nav="calculator"><i class="fa-solid fa-calculator"></i>Калкулатор</a></li>
+      <li><a href="svejarka.html" class="active"><i class="fa-solid fa-robot"></i>Svejarka AI</a></li>
+      <li><a href="index.html#barbers" data-nav="barbers"><i class="fa-solid fa-users"></i>Екипът</a></li>
+      <li><a href="index.html#contact" data-nav="contact"><i class="fa-solid fa-location-dot"></i>Контакти</a></li>
+    </ul>
+  </nav>
+  <div class="drawer-cta"><a href="index.html#barbers" data-nav="barbers" class="btn btn-gold btn-block"><i class="fa-solid fa-calendar-check"></i>Запази час</a></div>
+  <div class="drawer-foot">Център, Мездра</div>
+</aside>
+
+<main id="mainContent">
+
+<!-- ================= SVEJARKA AI HERO ================= -->
+<section class="section on-dark svejarka-hero">
+  <div class="container">
+    <span class="hero-badge"><i class="fa-solid fa-wand-magic-sparkles"></i>&nbsp; AI Асистент</span>
+    <h1 class="svejarka-title">SVEJARKA <span>AI</span></h1>
+    <p class="lede">Твоят виртуален стил-консултант. Питай за прическа, брада, боя или грижа за косата — Svejarka AI ще те насочи, а екипът на Gucci Salon ще довърши магията на място.</p>
+  </div>
+</section>
+
+<!-- ================= CHAT ================= -->
+<section class="section svejarka-chat-section">
+  <div class="container svejarka-wrap">
+    <h2 class="svejarka-chat-title"><i class="fa-solid fa-comments"></i>Чат със <span>Svejarkata</span></h2>
+    <div class="svejarka-chat" id="svejarkaChat" aria-live="polite">
+      <div class="svejarka-msg bot">
+        <div class="svejarka-bubble">Здравей! Аз съм Svejarka AI 💈 Разкажи ми малко за себе си — форма на лицето, дължина на косата или какъв стил търсиш — и ще ти предложа идеи. После просто запази час в Gucci Salon, за да ги превърнем в реалност.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="svejarka-composer">
+  <div class="container svejarka-wrap">
+    <div class="svejarka-preview" id="svejarkaPreview" hidden>
+      <img id="svejarkaPreviewImg" alt="Преглед на снимката">
+      <span>Снимката е прикачена</span>
+      <button type="button" class="svejarka-preview-remove" id="svejarkaPreviewRemove" aria-label="Премахни снимката"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form class="svejarka-inputbar" id="svejarkaForm">
+      <input type="file" id="svejarkaFile" accept="image/*" hidden>
+      <input type="text" id="svejarkaInput" maxlength="500" placeholder="Напиши въпрос или прикачи снимка..." autocomplete="off">
+      <button type="button" class="svejarka-attach" id="svejarkaAttachBtn" aria-label="Прикачи снимка"><i class="fa-solid fa-camera"></i></button>
+      <button type="submit" class="btn btn-gold" id="svejarkaSend" aria-label="Изпрати"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
+  </div>
+</div>
+
+</main>
+
+<!-- MOBILE TAB BAR -->
+<nav class="mobile-tabbar">
+  <a href="svejarka.html" class="active"><i class="fa-solid fa-robot"></i>Svejarka</a>
+  <a href="index.html#home"><i class="fa-solid fa-house"></i>Начало</a>
+  <a href="index.html#gallery"><i class="fa-solid fa-images"></i>Галерия</a>
+  <a href="index.html#faceshape"><i class="fa-solid fa-wand-magic-sparkles"></i>Стил</a>
+  <a href="index.html#calculator"><i class="fa-solid fa-calculator"></i>Цена</a>
+  <a href="index.html#barbers"><i class="fa-solid fa-phone"></i>Час</a>
+</nav>
+
+<script src="script.js" defer></script>
+<script src="svejarka.js" defer></script>
+</body>
+</html>
