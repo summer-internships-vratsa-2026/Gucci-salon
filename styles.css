@@ -103,10 +103,10 @@ section[id]{ scroll-margin-top: var(--header-h); }
    overflow:hidden for its own shimmer effect, which would otherwise clip
    a badge positioned to overlap the edge. */
 .btn-ai-wrap{ position:relative; display:inline-flex; }
-.btn-ai{ animation: aiGlowPulse 2.4s ease-in-out infinite; }
+.btn-ai{ animation: aiGlowPulse 1.3s ease-in-out infinite; }
 @keyframes aiGlowPulse{
   0%, 100%{ box-shadow:0 10px 30px -8px var(--gold-glow); }
-  50%{ box-shadow:0 12px 42px -4px var(--gold-glow), 0 0 0 7px rgba(198,161,92,.16); }
+  50%{ box-shadow:0 14px 50px -2px var(--gold-glow), 0 0 0 11px rgba(198,161,92,.34); }
 }
 .ai-badge{
   position:absolute; top:-9px; right:-9px; z-index:3; pointer-events:none;
@@ -114,9 +114,9 @@ section[id]{ scroll-margin-top: var(--header-h); }
   background:var(--ink); color:var(--gold-light); border:1px solid var(--gold);
   border-radius:999px; font-size:.62rem; font-weight:800; letter-spacing:.05em;
   box-shadow:0 4px 12px rgba(0,0,0,.4);
-  animation: aiBadgeBob 2.4s ease-in-out infinite;
+  animation: aiBadgeBob 1.3s ease-in-out infinite;
 }
-@keyframes aiBadgeBob{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-3px) scale(1.06); } }
+@keyframes aiBadgeBob{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-5px) scale(1.14); } }
 .hero-cta-ai{ display:flex; flex-direction:column; align-items:center; gap:9px; }
 .hero-cta-ai-tag{
   font-size:.7rem; letter-spacing:.03em; color:var(--gold-light); opacity:.85;
