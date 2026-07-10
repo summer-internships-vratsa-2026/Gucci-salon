@@ -98,12 +98,14 @@ section[id]{ scroll-margin-top: var(--header-h); }
 
 /* Svejarka AI CTAs — meant to stand out from the other, plainer buttons:
    an idle pulsing glow (not just on hover) plus a small bobbing "AI" badge
-   that overlaps the button's corner. The badge lives in a small sibling
-   wrapper (.btn-ai-wrap) rather than inside the <a>, because .btn has
-   overflow:hidden for its own shimmer effect, which would otherwise clip
-   a badge positioned to overlap the edge. */
-.btn-ai-wrap{ position:relative; display:inline-flex; }
-.btn-ai{ animation: aiGlowPulse 1.3s ease-in-out infinite; }
+   that overlaps the button's corner. Both the glow and the badge live on
+   .btn-ai-wrap (a plain sibling wrapper), NOT on the <a class="btn"> itself
+   — .btn has overflow:hidden for its own shimmer sweep, which was silently
+   clipping the glow's box-shadow to nothing no matter how strong we made it. */
+.btn-ai-wrap{
+  position:relative; display:inline-flex; border-radius:var(--radius);
+  animation: aiGlowPulse 1.3s ease-in-out infinite;
+}
 @keyframes aiGlowPulse{
   0%, 100%{ box-shadow:0 10px 30px -8px var(--gold-glow); }
   50%{ box-shadow:0 14px 50px -2px var(--gold-glow), 0 0 0 11px rgba(198,161,92,.34); }
@@ -123,7 +125,7 @@ section[id]{ scroll-margin-top: var(--header-h); }
   max-width:210px; line-height:1.35; text-align:center;
 }
 @media (prefers-reduced-motion: reduce){
-  .btn-ai, .ai-badge{ animation:none !important; }
+  .btn-ai-wrap, .ai-badge{ animation:none !important; }
 }
 
 .pill-toggle{ display:inline-flex; background:var(--ink-2); border-radius:40px; padding:4px; gap:4px; }
