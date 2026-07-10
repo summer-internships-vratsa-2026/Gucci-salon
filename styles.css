@@ -96,6 +96,36 @@ section[id]{ scroll-margin-top: var(--header-h); }
 .btn-call:hover{ background:var(--gold); color:#1a1408; box-shadow:0 12px 30px -8px var(--gold-glow); transform:translateY(-2px); }
 .btn-call i{ font-size:1rem; }
 
+/* Svejarka AI CTAs — meant to stand out from the other, plainer buttons:
+   an idle pulsing glow (not just on hover) plus a small bobbing "AI" badge
+   that overlaps the button's corner. The badge lives in a small sibling
+   wrapper (.btn-ai-wrap) rather than inside the <a>, because .btn has
+   overflow:hidden for its own shimmer effect, which would otherwise clip
+   a badge positioned to overlap the edge. */
+.btn-ai-wrap{ position:relative; display:inline-flex; }
+.btn-ai{ animation: aiGlowPulse 2.4s ease-in-out infinite; }
+@keyframes aiGlowPulse{
+  0%, 100%{ box-shadow:0 10px 30px -8px var(--gold-glow); }
+  50%{ box-shadow:0 12px 42px -4px var(--gold-glow), 0 0 0 7px rgba(198,161,92,.16); }
+}
+.ai-badge{
+  position:absolute; top:-9px; right:-9px; z-index:3; pointer-events:none;
+  display:flex; align-items:center; justify-content:center; min-width:26px; height:20px; padding:0 6px;
+  background:var(--ink); color:var(--gold-light); border:1px solid var(--gold);
+  border-radius:999px; font-size:.62rem; font-weight:800; letter-spacing:.05em;
+  box-shadow:0 4px 12px rgba(0,0,0,.4);
+  animation: aiBadgeBob 2.4s ease-in-out infinite;
+}
+@keyframes aiBadgeBob{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-3px) scale(1.06); } }
+.hero-cta-ai{ display:flex; flex-direction:column; align-items:center; gap:9px; }
+.hero-cta-ai-tag{
+  font-size:.7rem; letter-spacing:.03em; color:var(--gold-light); opacity:.85;
+  max-width:210px; line-height:1.35; text-align:center;
+}
+@media (prefers-reduced-motion: reduce){
+  .btn-ai, .ai-badge{ animation:none !important; }
+}
+
 .pill-toggle{ display:inline-flex; background:var(--ink-2); border-radius:40px; padding:4px; gap:4px; }
 .pill-toggle button{
   padding:10px 22px; border-radius:40px; font-size:.78rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
@@ -218,7 +248,7 @@ section[id]{ scroll-margin-top: var(--header-h); }
   opacity:0; animation: fadeUp .9s var(--ease) .62s forwards;
 }
 .hero-ctas{
-  margin-top:34px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+  margin-top:34px; display:flex; gap:14px; justify-content:center; align-items:flex-start; flex-wrap:wrap;
   opacity:0; animation: fadeUp .9s var(--ease) .76s forwards;
 }
 .hero-loc{
