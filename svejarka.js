@@ -41,12 +41,31 @@
   // reserve at the bottom of the chat feed, measure the composer's real
   // rendered height live and expose it as a CSS variable that the chat
   // section's padding-bottom reads from (see styles.css --composer-h).
-  if (composerEl && typeof ResizeObserver === 'function'){
-    const reportComposerHeight = () => {
-      document.documentElement.style.setProperty('--composer-h', composerEl.offsetHeight + 'px');
-    };
-    new ResizeObserver(reportComposerHeight).observe(composerEl);
-    reportComposerHeight();
+  //
+  // The mobile tab bar gets the same treatment (--tabbar-h). The composer
+  // is anchored just above the tab bar, so the tab bar's real height also
+  // has to be added to the chat feed's bottom padding — otherwise that gap
+  // is missing entirely and the last part of every message stays hidden
+  // behind the two fixed bars, with no way to scroll far enough to see it.
+  // Measuring live (rather than hardcoding e.g. 70px) also survives the
+  // tab bar's height varying by device (home-indicator safe-area-inset)
+  // and correctly collapses to 0 on desktop widths where it's display:none.
+  const tabbarEl = document.querySelector('.mobile-tabbar');
+  if (typeof ResizeObserver === 'function'){
+    if (composerEl){
+      const reportComposerHeight = () => {
+        document.documentElement.style.setProperty('--composer-h', composerEl.offsetHeight + 'px');
+      };
+      new ResizeObserver(reportComposerHeight).observe(composerEl);
+      reportComposerHeight();
+    }
+    if (tabbarEl){
+      const reportTabbarHeight = () => {
+        document.documentElement.style.setProperty('--tabbar-h', tabbarEl.offsetHeight + 'px');
+      };
+      new ResizeObserver(reportTabbarHeight).observe(tabbarEl);
+      reportTabbarHeight();
+    }
   }
 
   const MAX_HISTORY_SENT = 8;          // keep upload payload small as the chat grows

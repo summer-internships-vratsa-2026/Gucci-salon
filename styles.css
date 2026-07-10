@@ -602,7 +602,13 @@ body.svejarka-page{ padding-bottom:0; }
    .svejarka-composer live and writes it to --composer-h) plus a small buffer, instead of
    a hardcoded guess — a hardcoded value is always wrong the moment the composer's actual
    height differs (e.g. no photo attached vs. photo preview shown), leaving a dead gap. */
-.svejarka-chat-section{ padding-top:48px; padding-bottom: calc(var(--composer-h, 160px) + 24px); }
+/* This must also reserve space for the fixed mobile tab bar (see --tabbar-h,
+   measured live in svejarka.js) that sits BELOW the composer — the composer's
+   own "bottom" offset is what pushes it up above the tab bar in the first
+   place, so that same amount of extra clearance is needed down here too, or
+   the last chunk of every message ends up hidden behind both fixed bars and
+   the page can't be scrolled far enough to reveal it. */
+.svejarka-chat-section{ padding-top:48px; padding-bottom: calc(var(--composer-h, 160px) + var(--tabbar-h, 70px) + 24px); }
 
 .svejarka-chat-title{
   display:flex; align-items:center; justify-content:center; gap:12px;
@@ -641,13 +647,17 @@ body.svejarka-page{ padding-bottom:0; }
 /* Fixed to the actual screen edge — always sits flush above the tab bar with no gap,
    regardless of scroll position or the mobile browser's address bar resizing the viewport. */
 .svejarka-composer{
-  position:fixed; left:0; right:0; bottom:70px; z-index:500;
+  position:fixed; left:0; right:0; bottom:var(--tabbar-h, 70px); z-index:500;
   padding:18px 0 calc(16px + env(safe-area-inset-bottom));
   background:linear-gradient(to top, var(--paper) 58%, rgba(250,248,243,.92) 80%, rgba(250,248,243,0));
 }
 .svejarka-inputbar{ display:flex; align-items:center; gap:8px; }
 .svejarka-inputbar input{
-  flex:1; padding:15px 20px; border:1px solid var(--line); border-radius:999px;
+  /* min-width:0 overrides the flex item's default min-width:auto — without it,
+     the input refuses to shrink below its intrinsic content size on narrow
+     phones, which pushes the whole row wider than the screen and clips the
+     send button off the right edge instead of letting the input shrink. */
+  flex:1; min-width:0; padding:15px 20px; border:1px solid var(--line); border-radius:999px;
   font-family:var(--font-body); font-size:.95rem; background:var(--paper); color:var(--text-dark);
   box-shadow:0 8px 24px rgba(0,0,0,.06);
 }
@@ -713,5 +723,10 @@ body.svejarka-page{ padding-bottom:0; }
 }
 
 @media (min-width:900px){
+  /* Belt-and-braces fallback for the instant before JS measures the (hidden,
+     0px-tall) tab bar: without this, a page load on a wide viewport would
+     briefly use the 70px mobile fallback and leave a dead gap above the
+     composer / at the bottom of the chat feed. */
   .svejarka-composer{ bottom:0; }
+  .svejarka-chat-section{ padding-bottom: calc(var(--composer-h, 160px) + 24px); }
 }
