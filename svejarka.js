@@ -25,9 +25,7 @@
   const input = document.getElementById('svejarkaInput');
   const sendBtn = document.getElementById('svejarkaSend');
   const attachBtn = document.getElementById('svejarkaAttachBtn');
-  const cameraBtn = document.getElementById('svejarkaCameraBtn');
   const fileInput = document.getElementById('svejarkaFile');
-  const cameraInput = document.getElementById('svejarkaFileCamera');
   const previewWrap = document.getElementById('svejarkaPreview');
   const previewImg = document.getElementById('svejarkaPreviewImg');
   const previewRemove = document.getElementById('svejarkaPreviewRemove');
@@ -105,7 +103,6 @@
     sendBtn.disabled = state;
     input.disabled = state;
     if (attachBtn) attachBtn.disabled = state;
-    if (cameraBtn) cameraBtn.disabled = state;
   }
 
   function setPendingImage(dataUrl){
@@ -115,7 +112,6 @@
     if (previewImg) previewImg.src = dataUrl;
     if (previewWrap) previewWrap.hidden = false;
     if (attachBtn) attachBtn.classList.add('has-image');
-    if (cameraBtn) cameraBtn.classList.add('has-image');
   }
 
   function clearPendingImage(){
@@ -123,7 +119,6 @@
     if (previewImg) previewImg.removeAttribute('src');
     if (previewWrap) previewWrap.hidden = true;
     if (attachBtn) attachBtn.classList.remove('has-image');
-    if (cameraBtn) cameraBtn.classList.remove('has-image');
   }
 
   function loadImageElement(file){
@@ -172,46 +167,32 @@
     return dataUrl;
   }
 
-  // Shared by both the gallery picker and the direct-camera capture — same
-  // validation and client-side compression either way, only the source input differs.
-  async function handleSelectedFile(file, triggerBtn){
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')){
-      addMessage('bot', 'Може да прикачиш само снимка (JPG, PNG, WEBP).');
-      return;
-    }
-    if (file.size > MAX_SOURCE_MB * 1024 * 1024){
-      addMessage('bot', `Снимката е твърде голяма (макс. ${MAX_SOURCE_MB}MB).`);
-      return;
-    }
-
-    if (triggerBtn) triggerBtn.disabled = true;
-    try{
-      const dataUrl = await compressImage(file);
-      setPendingImage(dataUrl);
-    } catch (err){
-      addMessage('bot', 'Не успях да обработя снимката. Опитай с друга.');
-    } finally {
-      if (triggerBtn) triggerBtn.disabled = false;
-    }
-  }
-
   if (attachBtn && fileInput){
     attachBtn.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', () => {
+
+    fileInput.addEventListener('change', async () => {
       const file = fileInput.files && fileInput.files[0];
       fileInput.value = ''; // allow re-selecting the same file later
-      handleSelectedFile(file, attachBtn);
-    });
-  }
+      if (!file) return;
 
-  if (cameraBtn && cameraInput){
-    cameraBtn.addEventListener('click', () => cameraInput.click());
-    cameraInput.addEventListener('change', () => {
-      const file = cameraInput.files && cameraInput.files[0];
-      cameraInput.value = ''; // allow capturing another photo later
-      handleSelectedFile(file, cameraBtn);
+      if (!file.type.startsWith('image/')){
+        addMessage('bot', 'Може да прикачиш само снимка (JPG, PNG, WEBP).');
+        return;
+      }
+      if (file.size > MAX_SOURCE_MB * 1024 * 1024){
+        addMessage('bot', `Снимката е твърде голяма (макс. ${MAX_SOURCE_MB}MB).`);
+        return;
+      }
+
+      attachBtn.disabled = true;
+      try{
+        const dataUrl = await compressImage(file);
+        setPendingImage(dataUrl);
+      } catch (err){
+        addMessage('bot', 'Не успях да обработя снимката. Опитай с друга.');
+      } finally {
+        attachBtn.disabled = false;
+      }
     });
   }
 

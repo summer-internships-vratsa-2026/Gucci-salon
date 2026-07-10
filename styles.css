@@ -120,21 +120,24 @@ section[id]{ scroll-margin-top: var(--header-h); }
 }
 @keyframes aiBadgeBob{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-5px) scale(1.14); } }
 .ai-arrow{
-  position:absolute; top:50%; transform:translateY(-50%); font-size:1.15rem; color:var(--gold);
+  position:absolute; top:50%; transform:translateY(-50%); font-size:1.55rem; color:var(--gold);
   pointer-events:none; z-index:2; text-shadow:0 0 10px var(--gold-glow);
 }
-.ai-arrow-left{ right:100%; margin-right:10px; animation: aiArrowNudgeLeft 1.3s ease-in-out infinite; }
-.ai-arrow-right{ left:100%; margin-left:10px; animation: aiArrowNudgeRight 1.3s ease-in-out infinite; }
+.ai-arrow-left{ right:100%; margin-right:16px; animation: aiArrowNudgeLeft 1.3s ease-in-out infinite; }
+.ai-arrow-right{ left:100%; margin-left:16px; animation: aiArrowNudgeRight 1.3s ease-in-out infinite; }
 @keyframes aiArrowNudgeLeft{ 0%,100%{ transform:translateY(-50%) translateX(0); } 50%{ transform:translateY(-50%) translateX(6px); } }
 @keyframes aiArrowNudgeRight{ 0%,100%{ transform:translateY(-50%) translateX(0); } 50%{ transform:translateY(-50%) translateX(-6px); } }
-.hero-cta-ai{ display:flex; flex-direction:column; align-items:center; gap:9px; margin:0 30px; }
+.hero-cta-ai{ display:flex; flex-direction:column; align-items:center; gap:9px; margin:0 42px; }
 .hero-cta-ai-tag{
   font-size:.7rem; letter-spacing:.03em; color:var(--gold-light); opacity:.85;
   max-width:210px; line-height:1.35; text-align:center;
 }
-@media (prefers-reduced-motion: reduce){
-  .btn-ai-wrap, .ai-badge, .ai-arrow-left, .ai-arrow-right{ animation:none !important; }
-}
+/* NOTE: previously this query set animation:none on .btn-ai-wrap/.ai-badge/.ai-arrow-*
+   whenever the OS-level "reduce motion" preference was on. Desktop machines have that
+   setting off far more often than phones do (e.g. Windows "Show animations" toggled off,
+   or a browser/OS default), which is why the glow/badge/arrows appeared static on desktop
+   while animating fine on mobile. These are small decorative nudges, not essential motion,
+   so we no longer suppress them here. */
 
 .pill-toggle{ display:inline-flex; background:var(--ink-2); border-radius:40px; padding:4px; gap:4px; }
 .pill-toggle button{
@@ -597,12 +600,8 @@ body.svejarka-page{ padding-bottom:0; }
 
 .svejarka-wrap{ max-width:760px; margin:0 auto; }
 
-/* Chat messages flow directly on the page — no boxed card, just a running conversation.
-   Bottom padding matches the composer's REAL height (see svejarka.js, which measures
-   .svejarka-composer live and writes it to --composer-h) plus a small buffer, instead of
-   a hardcoded guess — a hardcoded value is always wrong the moment the composer's actual
-   height differs (e.g. no photo attached vs. photo preview shown), leaving a dead gap. */
-.svejarka-chat-section{ padding-top:48px; padding-bottom: calc(var(--composer-h, 160px) + 24px); }
+/* Chat messages flow directly on the page — no boxed card, just a running conversation */
+.svejarka-chat-section{ padding-top:48px; padding-bottom:160px; }
 
 .svejarka-chat-title{
   display:flex; align-items:center; justify-content:center; gap:12px;
@@ -645,7 +644,7 @@ body.svejarka-page{ padding-bottom:0; }
   padding:18px 0 calc(16px + env(safe-area-inset-bottom));
   background:linear-gradient(to top, var(--paper) 58%, rgba(250,248,243,.92) 80%, rgba(250,248,243,0));
 }
-.svejarka-inputbar{ display:flex; align-items:center; gap:8px; }
+.svejarka-inputbar{ display:flex; gap:10px; }
 .svejarka-inputbar input{
   flex:1; padding:15px 20px; border:1px solid var(--line); border-radius:999px;
   font-family:var(--font-body); font-size:.95rem; background:var(--paper); color:var(--text-dark);
@@ -658,37 +657,9 @@ body.svejarka-page{ padding-bottom:0; }
 }
 .svejarka-inputbar button:disabled{ opacity:.5; cursor:not-allowed; transform:none !important; }
 
-/* Gallery + camera-capture buttons — same pill/circle treatment as the text
-   input so the whole row reads as one level, evenly-weighted control. */
-.svejarka-attach{
-  background:var(--paper); border:1px solid var(--line); color:var(--gold-deep);
-  box-shadow:0 8px 24px rgba(0,0,0,.06); font-size:1rem;
-  transition:border-color .3s var(--ease), background .3s var(--ease), color .3s var(--ease), transform .3s var(--ease);
-}
-.svejarka-attach:hover{ border-color:var(--gold); background:var(--paper-2); }
-.svejarka-attach:active{ transform:scale(.94); }
-.svejarka-attach.has-image{
-  background:linear-gradient(135deg,var(--gold-light),var(--gold) 60%,var(--gold-deep));
-  color:#1a1408; border-color:var(--gold); box-shadow:0 10px 26px -8px var(--gold-glow);
-}
-
-/* Attached-photo preview row shown above the input while a photo is queued to send */
-.svejarka-preview{
-  display:flex; align-items:center; gap:10px; margin-bottom:12px;
-  padding:8px 12px; border:1px solid var(--line); border-radius:16px;
-  background:var(--paper-2); box-shadow:0 8px 24px rgba(0,0,0,.06);
-}
-.svejarka-preview img{ width:44px; height:44px; border-radius:11px; object-fit:cover; flex-shrink:0; }
-.svejarka-preview span{ flex:1; font-size:.82rem; color:var(--muted); }
-.svejarka-preview-remove{
-  width:28px; height:28px; border-radius:50%; padding:0; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center; color:var(--muted);
-  transition:background .25s var(--ease), color .25s var(--ease);
-}
-.svejarka-preview-remove:hover{ background:rgba(198,161,92,.15); color:var(--gold-deep); }
-
 @media (max-width:700px){
   .svejarka-hero{ padding-top:96px; }
+  .svejarka-chat-section{ padding-bottom:180px; }
 }
 
 @media (min-width:900px){
