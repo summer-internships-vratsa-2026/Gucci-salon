@@ -22,17 +22,6 @@
   --font-display: "Bodoni Moda", "Playfair Display", serif;
   --font-body: "Manrope", -apple-system, sans-serif;
   --header-h: 74px;
-  /* Compact content height of the mobile tab bar (icon + label + its own padding),
-     not counting the device's home-indicator safe area. Anything that needs to sit
-     flush above the tab bar (e.g. Svejarka's composer) should reference
-     --tabbar-total-h below instead of a hardcoded pixel guess, so the two can
-     never drift apart on a device where the safe-area inset differs from what
-     was assumed. */
-  --tabbar-h: 64px;
-  --tabbar-total-h: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
-  /* Fallback for first paint before JS measures the real composer height
-     (see svejarka.js ResizeObserver) — roughly matches the no-preview state. */
-  --composer-h: 96px;
 }
 
 *{box-sizing:border-box; margin:0; padding:0;}
@@ -57,7 +46,6 @@ section[id]{ scroll-margin-top: var(--header-h); }
 
 @media (prefers-reduced-motion: reduce){
   *{ scroll-behavior:auto !important; }
-  .scroll-cue{ animation:none !important; }
 }
 
 /* ============================================================
@@ -240,12 +228,6 @@ section[id]{ scroll-margin-top: var(--header-h); }
 }
 .hero-loc i{ color:var(--gold); }
 @keyframes fadeUp{ from{opacity:0; transform:translateY(22px);} to{opacity:1; transform:translateY(0);} }
-
-.scroll-cue{
-  position:absolute; bottom:26px; left:50%; transform:translateX(-50%); color:var(--gold-deep);
-  font-size:1.3rem; animation: bob 2.2s ease-in-out infinite;
-}
-@keyframes bob{ 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,8px);} }
 
 /* ============================================================
    4. HOME EXTRAS
@@ -514,8 +496,7 @@ section[id]{ scroll-margin-top: var(--header-h); }
 ============================================================ */
 .mobile-tabbar{
   position:fixed; bottom:0; left:0; right:0; z-index:900; background:rgba(12,11,13,.92); backdrop-filter:blur(14px);
-  border-top:1px solid var(--line); display:flex; align-items:center;
-  height:var(--tabbar-total-h); padding:0 6px env(safe-area-inset-bottom, 0px);
+  border-top:1px solid var(--line); display:flex; padding:8px 6px calc(8px + env(safe-area-inset-bottom));
 }
 .mobile-tabbar a{
   flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:6px 2px;
@@ -528,7 +509,7 @@ section[id]{ scroll-margin-top: var(--header-h); }
 .mobile-tabbar a.active::before{
   content:""; position:absolute; top:-9px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--gold);
 }
-body{ padding-bottom:var(--tabbar-total-h); }
+body{ padding-bottom:70px; }
 /* Svejarka's composer already reserves its own space above the tab bar (see .svejarka-composer),
    so the generic body clearance would double up and leave an empty gap beneath it. */
 body.svejarka-page{ padding-bottom:0; }
@@ -547,7 +528,7 @@ body.svejarka-page{ padding-bottom:0; }
   .footer-top{ flex-direction:row; justify-content:space-between; }
 }
 @media (min-width:900px){
-  :root{ --header-h:86px; --tabbar-total-h:0px; }
+  :root{ --header-h:86px; }
   .desktop-nav{ display:block; }
   .burger{ display:none; }
   .section{ padding:100px 0; }
@@ -576,12 +557,8 @@ body.svejarka-page{ padding-bottom:0; }
 
 .svejarka-wrap{ max-width:760px; margin:0 auto; }
 
-/* Chat messages flow directly on the page — no boxed card, just a running conversation.
-   Bottom clearance = tab bar height + the composer's real height (measured live by
-   a ResizeObserver in svejarka.js, since the composer grows when a photo preview
-   appears) + a small gap, so nothing is ever hidden behind the fixed composer
-   regardless of whether a photo is attached. */
-.svejarka-chat-section{ padding-top:48px; padding-bottom:calc(var(--tabbar-total-h) + var(--composer-h) + 24px); }
+/* Chat messages flow directly on the page — no boxed card, just a running conversation */
+.svejarka-chat-section{ padding-top:48px; padding-bottom:160px; }
 
 .svejarka-chat-title{
   display:flex; align-items:center; justify-content:center; gap:12px;
@@ -618,18 +595,15 @@ body.svejarka-page{ padding-bottom:0; }
 }
 
 /* Fixed to the actual screen edge — always sits flush above the tab bar with no gap,
-   regardless of scroll position or the mobile browser's address bar resizing the viewport.
-   bottom uses the same --tabbar-total-h variable as .mobile-tabbar's own height, so the
-   two can never fall out of sync (that mismatch was the cause of the gap between the
-   input field and the nav bar on some phones). */
+   regardless of scroll position or the mobile browser's address bar resizing the viewport. */
 .svejarka-composer{
-  position:fixed; left:0; right:0; bottom:var(--tabbar-total-h); z-index:500;
-  padding:18px 0 16px;
+  position:fixed; left:0; right:0; bottom:70px; z-index:500;
+  padding:18px 0 calc(16px + env(safe-area-inset-bottom));
   background:linear-gradient(to top, var(--paper) 58%, rgba(250,248,243,.92) 80%, rgba(250,248,243,0));
 }
 .svejarka-inputbar{ display:flex; gap:10px; }
 .svejarka-inputbar input{
-  flex:1; min-width:0; padding:15px 20px; border:1px solid var(--line); border-radius:999px;
+  flex:1; padding:15px 20px; border:1px solid var(--line); border-radius:999px;
   font-family:var(--font-body); font-size:.95rem; background:var(--paper); color:var(--text-dark);
   box-shadow:0 8px 24px rgba(0,0,0,.06);
 }
@@ -640,39 +614,9 @@ body.svejarka-page{ padding-bottom:0; }
 }
 .svejarka-inputbar button:disabled{ opacity:.5; cursor:not-allowed; transform:none !important; }
 
-.svejarka-attach{
-  background:var(--ink-2); color:var(--gold-light); border:1px solid var(--line);
-  transition:background .3s, border-color .3s, color .3s;
-}
-.svejarka-attach:hover{ background:var(--ink-3); }
-.svejarka-attach.has-image{ color:#1a1408; background:linear-gradient(135deg,var(--gold-light),var(--gold)); border-color:transparent; }
-
-.svejarka-preview{
-  display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:8px 12px;
-  background:var(--paper-2); border:1px solid var(--line); border-radius:14px;
-}
-/* The [hidden] attribute is how JS shows/hides this box. Author rules always
-   beat the browser's built-in "[hidden]{display:none}" rule, so without this
-   override the box would ignore `hidden` entirely and stay visible forever
-   — which is exactly what was happening. */
-.svejarka-preview[hidden]{ display:none; }
-.svejarka-preview img{ width:40px; height:40px; object-fit:cover; border-radius:8px; flex-shrink:0; }
-.svejarka-preview span{ font-size:.82rem; color:var(--muted); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.svejarka-preview-remove{
-  width:26px; height:26px; border-radius:50%; padding:0; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center; font-size:.75rem;
-  background:transparent; color:var(--muted); border:1px solid var(--line);
-}
-.svejarka-preview-remove:hover{ color:var(--text-dark); border-color:var(--gold); }
-
-/* A photo the client sent, shown inline inside their own chat bubble */
-.svejarka-bubble img.svejarka-msg-img{
-  display:block; max-width:200px; max-height:200px; width:100%; height:auto;
-  border-radius:12px; object-fit:cover; margin-bottom:8px;
-}
-
 @media (max-width:700px){
   .svejarka-hero{ padding-top:96px; }
+  .svejarka-chat-section{ padding-bottom:180px; }
 }
 
 @media (min-width:900px){
