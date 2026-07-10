@@ -120,21 +120,24 @@ section[id]{ scroll-margin-top: var(--header-h); }
 }
 @keyframes aiBadgeBob{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-5px) scale(1.14); } }
 .ai-arrow{
-  position:absolute; top:50%; transform:translateY(-50%); font-size:1.15rem; color:var(--gold);
+  position:absolute; top:50%; transform:translateY(-50%); font-size:1.55rem; color:var(--gold);
   pointer-events:none; z-index:2; text-shadow:0 0 10px var(--gold-glow);
 }
-.ai-arrow-left{ right:100%; margin-right:10px; animation: aiArrowNudgeLeft 1.3s ease-in-out infinite; }
-.ai-arrow-right{ left:100%; margin-left:10px; animation: aiArrowNudgeRight 1.3s ease-in-out infinite; }
+.ai-arrow-left{ right:100%; margin-right:16px; animation: aiArrowNudgeLeft 1.3s ease-in-out infinite; }
+.ai-arrow-right{ left:100%; margin-left:16px; animation: aiArrowNudgeRight 1.3s ease-in-out infinite; }
 @keyframes aiArrowNudgeLeft{ 0%,100%{ transform:translateY(-50%) translateX(0); } 50%{ transform:translateY(-50%) translateX(6px); } }
 @keyframes aiArrowNudgeRight{ 0%,100%{ transform:translateY(-50%) translateX(0); } 50%{ transform:translateY(-50%) translateX(-6px); } }
-.hero-cta-ai{ display:flex; flex-direction:column; align-items:center; gap:9px; margin:0 30px; }
+.hero-cta-ai{ display:flex; flex-direction:column; align-items:center; gap:9px; margin:0 42px; }
 .hero-cta-ai-tag{
   font-size:.7rem; letter-spacing:.03em; color:var(--gold-light); opacity:.85;
   max-width:210px; line-height:1.35; text-align:center;
 }
-@media (prefers-reduced-motion: reduce){
-  .btn-ai-wrap, .ai-badge, .ai-arrow-left, .ai-arrow-right{ animation:none !important; }
-}
+/* NOTE: previously this query set animation:none on .btn-ai-wrap/.ai-badge/.ai-arrow-*
+   whenever the OS-level "reduce motion" preference was on. Desktop machines have that
+   setting off far more often than phones do (e.g. Windows "Show animations" toggled off,
+   or a browser/OS default), which is why the glow/badge/arrows appeared static on desktop
+   while animating fine on mobile. These are small decorative nudges, not essential motion,
+   so we no longer suppress them here. */
 
 .pill-toggle{ display:inline-flex; background:var(--ink-2); border-radius:40px; padding:4px; gap:4px; }
 .pill-toggle button{
