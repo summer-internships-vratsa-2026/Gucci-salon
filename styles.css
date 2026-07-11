@@ -132,10 +132,6 @@ section[id]{ scroll-margin-top: var(--header-h); }
   font-size:.7rem; letter-spacing:.03em; color:var(--gold-light); opacity:.85;
   max-width:210px; line-height:1.35; text-align:center;
 }
-@media (prefers-reduced-motion: reduce){
-  .btn-ai-wrap, .ai-badge, .ai-arrow-left, .ai-arrow-right{ animation:none !important; }
-}
-
 .pill-toggle{ display:inline-flex; background:var(--ink-2); border-radius:40px; padding:4px; gap:4px; }
 .pill-toggle button{
   padding:10px 22px; border-radius:40px; font-size:.78rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
